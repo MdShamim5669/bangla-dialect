@@ -1,7 +1,14 @@
 import React from 'react';
-import { Languages, BookOpen, Settings, Sparkles } from 'lucide-react';
+import { Languages, BookOpen, Settings, Sun, Moon } from 'lucide-react';
 
-export default function Header({ onOpenInsights, onOpenSettings, isSimulationMode, backendOnline }) {
+export default function Header({ 
+  onOpenInsights, 
+  onOpenSettings, 
+  isSimulationMode, 
+  backendOnline,
+  theme,
+  onToggleTheme 
+}) {
   return (
     <header className="header-bar">
       <div className="brand-section">
@@ -50,6 +57,20 @@ export default function Header({ onOpenInsights, onOpenSettings, isSimulationMod
         >
           <Settings size={16} />
           <span>Settings</span>
+        </button>
+
+        {/* Theme Toggle Button (Dark / Light) */}
+        <button 
+          className="theme-toggle-btn" 
+          onClick={onToggleTheme}
+          title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          aria-label="Toggle Dark/Light Mode"
+        >
+          {theme === 'dark' ? (
+            <Sun size={18} className="theme-icon sun" />
+          ) : (
+            <Moon size={18} className="theme-icon moon" />
+          )}
         </button>
       </div>
     </header>

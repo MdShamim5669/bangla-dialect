@@ -25,6 +25,18 @@ export default function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
+  // Theme state: 'dark' | 'light'
+  const [theme, setTheme] = useState(() => localStorage.getItem('app_theme') || 'dark');
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('app_theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  };
+
   // Live Render backend API base URL
   const API_BASE = API_BASE_URL;
 
@@ -116,6 +128,8 @@ export default function App() {
         onOpenSettings={() => setIsSettingsOpen(true)}
         isSimulationMode={mode === 'simulation'}
         backendOnline={backendOnline}
+        theme={theme}
+        onToggleTheme={toggleTheme}
       />
 
       {/* Optional Error Alert */}
