@@ -24,11 +24,14 @@ export default function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
+  // API base URL (empty for local Vite proxy, or full URL when deployed to Vercel/Netlify)
+  const API_BASE = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+
   // Check backend health on mount
   useEffect(() => {
     const checkHealth = async () => {
       try {
-        const res = await fetch('/api/health');
+        const res = await fetch(`${API_BASE}/api/health`);
         if (res.ok) {
           const data = await res.json();
           setBackendOnline(true);
@@ -47,7 +50,7 @@ export default function App() {
       }
     };
     checkHealth();
-  }, [hfApiToken]);
+  }, [hfApiToken, API_BASE]);
 
   // Handle translation execution
   const handleTranslate = async () => {
@@ -58,7 +61,7 @@ export default function App() {
     setErrorMessage("");
 
     try {
-      const res = await fetch('/api/translate', {
+      const res = await fetch(`${API_BASE}/api/translate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

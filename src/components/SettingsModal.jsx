@@ -20,7 +20,8 @@ export default function SettingsModal({
     setTestResult(null);
 
     try {
-      const res = await fetch('/api/settings/verify', {
+      const API_BASE = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+      const res = await fetch(`${API_BASE}/api/settings/verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
