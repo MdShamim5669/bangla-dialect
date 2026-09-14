@@ -1,11 +1,58 @@
-import React, { useState } from 'react';
-import { X, Award, BarChart3, BookOpen, AlertCircle, CheckCircle2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Award, BarChart3, BookOpen, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
+import { API_BASE_URL } from '../config/api';
 import { RESEARCH_BENCHMARKS } from '../data/researchData';
 
 export default function InsightsModal({ isOpen, onClose }) {
   const [activeTab, setActiveTab] = useState('benchmarks'); // 'benchmarks' | 'regions' | 'findings'
+  const [insights, setInsights] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const fetchInsights = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/insights`);
+        if (res.ok) {
+          const data = await res.json();
+          setInsights(data);
+        }
+      } catch (err) {
+        console.warn("Could not fetch insights from backend, using fallback:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchInsights();
+  }, [isOpen]);
 
   if (!isOpen) return null;
+
+  const overallRows = insights?.overall_benchmarks || RESEARCH_BENCHMARKS.overall.map(r => ({
+    model: r.model,
+    bleu: r.bleu,
+    chrf: r.chrf,
+    bert_f1: r.bertF1,
+    sts_cosine: r.sts,
+    status: r.winner ? "Winner" : "Comparison"
+  }));
+
+  const perRegionRows = insights?.per_region_banglat5 || RESEARCH_BENCHMARKS.perRegion.map(r => ({
+    region: r.region,
+    test_n: r.testN,
+    bleu: r.bleu,
+    chrf: r.chrf,
+    bert_f1: r.bertF1,
+    sts_cosine: r.sts,
+    exact_match: r.exactMatch,
+    identical_in_data: r.identityRate
+  }));
+
+  const findings = insights?.key_findings || RESEARCH_BENCHMARKS.edaFindings.map(f => ({
+    headline: f.title,
+    detail: f.content
+  }));
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -14,7 +61,7 @@ export default function InsightsModal({ isOpen, onClose }) {
         <div className="modal-header">
           <h2>
             <BookOpen size={22} color="#6366f1" />
-            <span>Thesis & Research Insights</span>
+            <span>Thesis & Research Insights (Live Backend Model Deliverables)</span>
           </h2>
           <button className="icon-btn" onClick={onClose}>
             <X size={20} />
@@ -78,17 +125,17 @@ export default function InsightsModal({ isOpen, onClose }) {
                       </tr>
                     </thead>
                     <tbody>
-                      {RESEARCH_BENCHMARKS.overall.map((row, idx) => (
-                        <tr key={idx} className={row.winner ? 'highlight-row' : ''}>
+                      {overallRows.map((row, idx) => (
+                        <tr key={idx} className={row.status === 'Winner' || row.winner ? 'highlight-row' : ''}>
                           <td>
                             <strong>{row.model}</strong>
                           </td>
                           <td>{row.bleu}</td>
                           <td>{row.chrf}</td>
-                          <td>{row.bertF1}</td>
-                          <td>{row.sts}</td>
+                          <td>{row.bert_f1 || row.bertF1}</td>
+                          <td>{row.sts_cosine || row.sts}</td>
                           <td>
-                            {row.winner ? (
+                            {row.status === 'Winner' || row.winner ? (
                               <span style={{ color: '#10b981', display: 'flex', alignItems: 'center', gap: 4 }}>
                                 <CheckCircle2 size={14} /> Selected
                               </span>
@@ -136,16 +183,16 @@ export default function InsightsModal({ isOpen, onClose }) {
                     </tr>
                   </thead>
                   <tbody>
-                    {RESEARCH_BENCHMARKS.perRegion.map((reg, idx) => (
+                    {perRegionRows.map((reg, idx) => (
                       <tr key={idx} className={reg.region === 'Chittagong' ? 'highlight-row' : ''}>
                         <td><strong>{reg.region}</strong></td>
-                        <td>{reg.testN}</td>
+                        <td>{reg.test_n || reg.testN}</td>
                         <td>{reg.bleu}</td>
                         <td>{reg.chrf}</td>
-                        <td>{reg.bertF1}</td>
-                        <td>{reg.exactMatch}</td>
-                        <td style={{ color: parseFloat(reg.identityRate) > 10 ? '#38bdf8' : 'inherit' }}>
-                          {reg.identityRate}
+                        <td>{reg.bert_f1 || reg.bertF1}</td>
+                        <td>{reg.exact_match || reg.exactMatch}</td>
+                        <td style={{ color: parseFloat(reg.identical_in_data || reg.identityRate) > 10 ? '#38bdf8' : 'inherit' }}>
+                          {reg.identical_in_data || reg.identityRate}
                         </td>
                       </tr>
                     ))}
@@ -164,12 +211,12 @@ export default function InsightsModal({ isOpen, onClose }) {
           {/* TAB 3: KEY RESEARCH FINDINGS */}
           {activeTab === 'findings' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              {RESEARCH_BENCHMARKS.edaFindings.map((finding, idx) => (
+              {findings.map((finding, idx) => (
                 <div key={idx} className="info-card">
                   <h4 style={{ color: '#818cf8', display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span>#{idx + 1}</span> {finding.title}
+                    <span>#{idx + 1}</span> {finding.headline || finding.title}
                   </h4>
-                  <p>{finding.content}</p>
+                  <p>{finding.detail || finding.content}</p>
                 </div>
               ))}
 

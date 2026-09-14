@@ -8,6 +8,7 @@ import { REGIONS } from './data/regions';
 import { API_BASE_URL } from './config/api';
 
 export default function App() {
+  const [regions, setRegions] = useState(REGIONS);
   const [selectedRegion, setSelectedRegion] = useState(REGIONS[0]); // Default Chittagong
   const [inputText, setInputText] = useState("ক্যান আছু?");
   const [translatedText, setTranslatedText] = useState("কেমন আছো?");
@@ -40,13 +41,17 @@ export default function App() {
   // Live Render backend API base URL
   const API_BASE = API_BASE_URL;
 
-  // Check backend health on mount
+  // Check backend health & fetch dynamic regions from real dataset
   useEffect(() => {
-    const checkHealth = async () => {
+    const initBackend = async () => {
       try {
-        const res = await fetch(`${API_BASE}/api/health`);
-        if (res.ok) {
-          const data = await res.json();
+        const [healthRes, regionsRes] = await Promise.all([
+          fetch(`${API_BASE}/api/health`),
+          fetch(`${API_BASE}/api/regions`),
+        ]);
+
+        if (healthRes.ok) {
+          const data = await healthRes.json();
           setBackendOnline(true);
           if (!hfRepoId && data.default_repo_id) {
             setHfRepoId(data.default_repo_id);
@@ -57,17 +62,28 @@ export default function App() {
             setMode("simulation");
           }
         }
+
+        if (regionsRes.ok) {
+          const regionsData = await regionsRes.json();
+          if (Array.isArray(regionsData) && regionsData.length > 0) {
+            setRegions(regionsData);
+            setSelectedRegion(prev => regionsData.find(r => r.id === prev?.id) || regionsData[0]);
+          }
+        }
       } catch (err) {
         setBackendOnline(false);
-        console.warn("Backend not yet connected:", err);
+        console.warn("Backend connection notice:", err);
       }
     };
-    checkHealth();
+    initBackend();
   }, [hfApiToken, API_BASE]);
 
   // Handle translation execution
-  const handleTranslate = async () => {
-    if (!inputText.trim()) return;
+  const handleTranslate = async (overrideText, overrideRegion) => {
+    const textToUse = (typeof overrideText === 'string' ? overrideText : inputText).trim();
+    const regionToUse = overrideRegion || selectedRegion;
+
+    if (!textToUse) return;
 
     setIsLoading(true);
     setLoadingMessage("অনুবাদ করা হচ্ছে...");
@@ -78,8 +94,8 @@ export default function App() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          region: selectedRegion.id,
-          sentence: inputText.trim(),
+          region: regionToUse.id,
+          sentence: textToUse,
           hf_repo_id: hfRepoId || undefined,
           hf_api_token: hfApiToken || undefined,
         }),
@@ -87,26 +103,17 @@ export default function App() {
 
       const data = await res.json();
 
-      if (!res.ok) {
-        throw new Error(data.detail || data.error || "অনুবাদে সমস্যা হয়েছে।");
-      }
-
-      if (data.loading) {
-        // Model is cold starting on Hugging Face
-        setLoadingMessage(data.message || `মডেল লোড হচ্ছে (অনুমানিক ${data.estimated_time || 20}s)...`);
-        // Poll once after a few seconds or alert user
-        setTranslatedText(`[Model Loading: ${data.message}]`);
-      } else if (data.success) {
+      if (data.success) {
         setTranslatedText(data.translation);
-        setMode(data.mode);
+        if (data.mode) setMode(data.mode);
       } else {
-        throw new Error(data.error || "অনুবাদ সম্পন্ন করা যায়নি।");
+        setErrorMessage(data.error || data.message || "অনুবাদে সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।");
       }
     } catch (err) {
-      setErrorMessage(err.message || "সার্ভারের সাথে সংযোগ বিচ্ছিন্ন।");
-      console.error("Translation error:", err);
+      setErrorMessage("সার্ভারের সাথে সংযোগ স্থাপন করা সম্ভব হয়নি।");
     } finally {
       setIsLoading(false);
+      setLoadingMessage("");
     }
   };
 
@@ -146,14 +153,16 @@ export default function App() {
         </div>
       )}
 
-      {/* Dialect Region Selection (7 regions) */}
+      {/* Dialect Region Selection (7 regions dynamically fetched from dataset) */}
       <RegionSelector
+        regions={regions}
         selectedRegion={selectedRegion}
         onSelectRegion={(reg) => {
           setSelectedRegion(reg);
-          // Set first example as starter if input is empty
-          if (!inputText.trim() && reg.examples?.length > 0) {
-            setInputText(reg.examples[0]);
+          if (reg.examples?.length > 0) {
+            const sample = reg.examples[0];
+            setInputText(sample);
+            handleTranslate(sample, reg);
           }
         }}
       />

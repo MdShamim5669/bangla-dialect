@@ -159,7 +159,7 @@ export default function TranslationBox({
                 className="example-chip"
                 onClick={() => {
                   setInputText(ex);
-                  // Optional auto-translate trigger
+                  onTranslate(ex);
                 }}
               >
                 <Sparkles size={13} color="#a5b4fc" />
