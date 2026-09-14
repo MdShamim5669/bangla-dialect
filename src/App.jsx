@@ -117,6 +117,32 @@ export default function App() {
     }
   };
 
+  // Fetch fresh random samples from the backend dataset for the current or specified region
+  const handleShuffleSamples = async (targetRegion) => {
+    const reg = targetRegion || selectedRegion;
+    if (!reg) return;
+
+    try {
+      const res = await fetch(`${API_BASE}/api/random-sample?region=${reg.id}&count=4`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.samples && data.samples.length > 0) {
+          // Update selectedRegion with fresh examples from dataset
+          setSelectedRegion(prev => ({
+            ...prev,
+            examples: data.samples,
+          }));
+          // Put the primary random dialect sentence into the display and translate it
+          const randomSentence = data.primary_dialect || data.samples[0];
+          setInputText(randomSentence);
+          handleTranslate(randomSentence, reg);
+        }
+      }
+    } catch (err) {
+      console.warn("Could not fetch random samples from backend:", err);
+    }
+  };
+
   const handleSaveSettings = ({ hfRepoId: newRepo, hfApiToken: newToken }) => {
     setHfRepoId(newRepo);
     setHfApiToken(newToken);
@@ -159,11 +185,7 @@ export default function App() {
         selectedRegion={selectedRegion}
         onSelectRegion={(reg) => {
           setSelectedRegion(reg);
-          if (reg.examples?.length > 0) {
-            const sample = reg.examples[0];
-            setInputText(sample);
-            handleTranslate(sample, reg);
-          }
+          handleShuffleSamples(reg);
         }}
       />
 
@@ -174,6 +196,7 @@ export default function App() {
         setInputText={setInputText}
         translatedText={translatedText}
         onTranslate={handleTranslate}
+        onShuffleSamples={() => handleShuffleSamples(selectedRegion)}
         isLoading={isLoading}
         loadingMessage={loadingMessage}
         mode={mode}

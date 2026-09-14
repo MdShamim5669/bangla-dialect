@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Copy, Check, Volume2, RotateCcw, ArrowRight, Sparkles, Loader2 } from 'lucide-react';
+import { Copy, Check, Volume2, RotateCcw, ArrowRight, Sparkles, Loader2, Shuffle } from 'lucide-react';
 
 export default function TranslationBox({
   selectedRegion,
@@ -7,6 +7,7 @@ export default function TranslationBox({
   setInputText,
   translatedText,
   onTranslate,
+  onShuffleSamples,
   isLoading,
   loadingMessage,
   mode,
@@ -55,6 +56,18 @@ export default function TranslationBox({
               <span>{selectedRegion.nameEn} Dialect ({selectedRegion.nameBn})</span>
             </div>
             <div className="box-tools">
+              {onShuffleSamples && (
+                <button
+                  type="button"
+                  className="icon-btn"
+                  onClick={onShuffleSamples}
+                  title="র‌্যান্ডম নমুনা বাক্য লোড করুন (Random Sample from Dataset)"
+                  style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 8px', fontSize: '0.78rem', width: 'auto', borderRadius: '8px' }}
+                >
+                  <Shuffle size={13} />
+                  <span>র‌্যান্ডম বাক্য</span>
+                </button>
+              )}
               {inputText && (
                 <button className="icon-btn" onClick={handleClear} title="Clear text">
                   <RotateCcw size={15} />
@@ -148,8 +161,20 @@ export default function TranslationBox({
       {/* Quick Example Sentences Chips */}
       {selectedRegion.examples && selectedRegion.examples.length > 0 && (
         <div className="examples-section">
-          <div className="section-label">
+          <div className="section-label" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span>দ্রুত পরীক্ষার জন্য নমুনা বাক্য (Click to try):</span>
+            {onShuffleSamples && (
+              <button
+                type="button"
+                className="icon-btn"
+                onClick={onShuffleSamples}
+                title="রিসার্চ ডেটাসেট থেকে নতুন ৪টি নমুনা লোড করুন"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 10px', fontSize: '0.78rem', width: 'auto', borderRadius: '8px' }}
+              >
+                <Shuffle size={12} />
+                <span>নতুন নমুনা বদলান (Shuffle)</span>
+              </button>
+            )}
           </div>
           <div className="examples-pills">
             {selectedRegion.examples.map((ex, idx) => (
