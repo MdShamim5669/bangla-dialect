@@ -5,6 +5,7 @@ import TranslationBox from './components/TranslationBox';
 import InsightsModal from './components/InsightsModal';
 import SettingsModal from './components/SettingsModal';
 import { REGIONS } from './data/regions';
+import { API_BASE_URL } from './config/api';
 
 export default function App() {
   const [selectedRegion, setSelectedRegion] = useState(REGIONS[0]); // Default Chittagong
@@ -24,8 +25,8 @@ export default function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  // API base URL (empty for local Vite proxy, or full URL when deployed to Vercel/Netlify)
-  const API_BASE = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+  // Live Render backend API base URL
+  const API_BASE = API_BASE_URL;
 
   // Check backend health on mount
   useEffect(() => {

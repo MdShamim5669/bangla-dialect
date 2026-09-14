@@ -51,5 +51,7 @@ Open: **http://localhost:3000**
 ---
 
 ## 🔗 Backend Connection
-The frontend connects to the FastAPI backend API service via the Vite development proxy (`/api` -> `http://localhost:8000`).
-In production, Nginx reverse-proxies `/api/` calls directly to the backend service.
+The frontend connects to the live FastAPI backend service:
+- **Production Backend URL:** `https://bangla-dialect-api-backend.onrender.com`
+- **Interactive API Docs:** `https://bangla-dialect-api-backend.onrender.com/docs`
+- **Health Check:** `https://bangla-dialect-api-backend.onrender.com/api/health`

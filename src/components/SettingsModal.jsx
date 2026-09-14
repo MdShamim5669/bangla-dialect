@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, Settings, Key, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { API_BASE_URL } from '../config/api';
 
 export default function SettingsModal({
   isOpen,
@@ -20,7 +21,7 @@ export default function SettingsModal({
     setTestResult(null);
 
     try {
-      const API_BASE = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+      const API_BASE = API_BASE_URL;
       const res = await fetch(`${API_BASE}/api/settings/verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
