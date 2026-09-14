@@ -102,7 +102,8 @@ export default function TranslationBox({
         <div className="box-card">
           <div className="box-header">
             <div className="box-title">
-              <span className="emerald-gradient-text" style={{ fontWeight: 700 }}>
+              <span className="emerald-gradient-text" style={{ fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                <span className="target-dot" />
                 Standard Bengali (প্রমিত বাংলা)
               </span>
             </div>
@@ -147,10 +148,10 @@ export default function TranslationBox({
           <div className="box-footer">
             <span>
               {mode === 'simulation' && (
-                <span style={{ color: '#f59e0b', fontSize: '0.78rem' }}>Demo Simulation Mode</span>
+                <span className="mode-badge demo">Demo Simulation Mode</span>
               )}
               {mode === 'huggingface' && (
-                <span style={{ color: '#10b981', fontSize: '0.78rem' }}>Hugging Face Model Output</span>
+                <span className="mode-badge live">Hugging Face Model Output</span>
               )}
             </span>
             {copied && <span style={{ color: '#10b981', fontWeight: 600 }}>কপি করা হয়েছে!</span>}
@@ -161,17 +162,19 @@ export default function TranslationBox({
       {/* Quick Example Sentences Chips */}
       {selectedRegion.examples && selectedRegion.examples.length > 0 && (
         <div className="examples-section">
-          <div className="section-label" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span>দ্রুত পরীক্ষার জন্য নমুনা বাক্য (Click to try):</span>
+          <div className="examples-header">
+            <div className="examples-title">
+              <Sparkles size={15} className="sparkles-icon" />
+              <span>নমুনা বাক্য পরীক্ষা (Click to try):</span>
+            </div>
             {onShuffleSamples && (
               <button
                 type="button"
-                className="icon-btn"
+                className="shuffle-btn"
                 onClick={onShuffleSamples}
                 title="রিসার্চ ডেটাসেট থেকে নতুন ৪টি নমুনা লোড করুন"
-                style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 10px', fontSize: '0.78rem', width: 'auto', borderRadius: '8px' }}
               >
-                <Shuffle size={12} />
+                <Shuffle size={13} />
                 <span>নতুন নমুনা বদলান (Shuffle)</span>
               </button>
             )}

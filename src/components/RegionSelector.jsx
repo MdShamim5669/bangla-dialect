@@ -8,8 +8,11 @@ export default function RegionSelector({ regions = [], selectedRegion, onSelectR
   return (
     <section className="region-section">
       <div className="section-label">
-        <span>১. অঞ্চল নির্বাচন করুন (Select Dialect Region)</span>
-        <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>৭টি আঞ্চলিক উপভাষা সমর্থিত • Real Dataset Linked</span>
+        <div className="label-left">
+          <span className="step-badge">০১</span>
+          <span className="label-heading">অঞ্চল নির্বাচন করুন (Select Dialect Region)</span>
+        </div>
+        <span className="section-meta">৭টি আঞ্চলিক উপভাষা • Real Dataset Linked</span>
       </div>
 
       <div className="region-grid">

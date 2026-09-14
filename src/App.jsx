@@ -203,12 +203,12 @@ export default function App() {
       />
 
       {/* Footer Info */}
-      <footer style={{ marginTop: 'auto', paddingTop: 20, textAlign: 'center', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-        <p>
+      <footer className="app-footer">
+        <p className="footer-title">
           Research Project: <em>Preserving Dialects, Enhancing Communication: A Model For Translating Regional Bangladeshi Languages into Standard Bengali</em>
         </p>
-        <p style={{ marginTop: 4 }}>
-          Fine-tuned BanglaT5 Architecture • SacreBLEU: 50.87 • chrF: 75.34 • BERTScore: 0.9392
+        <p className="footer-metrics">
+          Fine-tuned BanglaT5 Architecture • SacreBLEU: <strong>50.87</strong> • chrF: <strong>75.34</strong> • BERTScore: <strong>0.9392</strong> • 14,130 Verified Pairs
         </p>
       </footer>
 

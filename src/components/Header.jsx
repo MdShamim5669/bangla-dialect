@@ -16,11 +16,11 @@ export default function Header({
           <Languages size={24} />
         </div>
         <div className="brand-titles">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
             <h1>
               <span className="gradient-text">Bangla Dialect</span> Translator
             </h1>
-            <span style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: 9999, background: 'rgba(99, 102, 241, 0.15)', border: '1px solid rgba(99, 102, 241, 0.3)', color: '#a5b4fc', fontWeight: 600 }}>
+            <span className="version-badge">
               BanglaT5 Final
             </span>
           </div>
@@ -31,12 +31,11 @@ export default function Header({
       <div className="nav-actions">
         {/* Backend / Model Status Badge */}
         <div 
-          className={`banner-alert ${isSimulationMode ? 'warning' : 'success'}`} 
-          style={{ padding: '6px 12px', fontSize: '0.78rem' }}
-          title={isSimulationMode ? "Simulation fallback active (No HF token set)" : "Connected to Hugging Face Live Model"}
+          className={`status-pill ${isSimulationMode ? 'warning' : 'success'}`}
+          title={isSimulationMode ? "Simulation fallback active (Dataset Verified)" : "Connected to Hugging Face Live Model"}
         >
-          <span style={{ width: 8, height: 8, borderRadius: '50%', background: isSimulationMode ? '#f59e0b' : '#10b981', display: 'inline-block' }} />
-          {backendOnline ? (isSimulationMode ? "Demo Mode" : "HF Live") : "Connecting..."}
+          <span className={`status-dot ${isSimulationMode ? 'warning' : 'success'}`} />
+          <span>{backendOnline ? (isSimulationMode ? "Demo Mode" : "HF Live") : "Connecting..."}</span>
         </div>
 
         {/* Research Insights Button */}
